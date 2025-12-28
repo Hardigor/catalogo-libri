@@ -1,979 +1,963 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
+<!DOCTYPE html>
+<html lang="it">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="Content-Style-Type" content="text/css">
-  <title></title>
-  <meta name="Generator" content="Cocoa HTML Writer">
-  <meta name="CocoaVersion" content="2685.3">
-  <style type="text/css">
-    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
-    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catalogo Libri - Integrazione Open Library (Smart)</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* TEMA CHIARO PREDEFINITO (DEFAULT) */
+            --primary-bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-color: #212529;
+            --accent-color: #001f4d; /* Blu scuro elegante per i libri */
+            --border-color: #adb5bd;
+            --button-bg: #343a40;
+            --button-hover: #23272b;
+            --button-text: #ffffff;
+            --header-bg: #ffffff;
+            --stat-bg: #e9ecef;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --shadow-hover: rgba(0, 0, 0, 0.15);
+            --warning-color: #c82333;
+            --row-even-bg: #f0f2f5;
+            --row-hover-bg: #dee2e6;
+            --radius: 6px;
+            --radius-sm: 3px;
+            --transition: all 0.2s ease;
+        }
+
+        /* Override per il TEMA SCURO */
+        html.dark-mode {
+            --primary-bg: #121212;
+            --card-bg: #1e1e1e;
+            --text-color: #e0e0e0;
+            --accent-color: #6ab7ff;
+            --border-color: #333;
+            --button-bg: #555;
+            --button-hover: #777;
+            --header-bg: #1a1a1a;
+            --stat-bg: #2d2d2d;
+            --shadow-color: rgba(0, 0, 0, 0.3);
+            --shadow-hover: rgba(0, 0, 0, 0.4);
+            --warning-color: #f44336;
+            --row-even-bg: #2a2a2a;
+            --row-hover-bg: #3d3d3d;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+        
+        html {
+            background-color: var(--primary-bg);
+            transition: background-color 0.3s ease;
+        }
+        
+        body {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 10px;
+            font-size: 14px;
+            color: var(--text-color);
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.4;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .main-content { flex: 1; width: 100%; }
+        
+        .header-container {
+            background: var(--header-bg);
+            padding: 12px;
+            border-radius: var(--radius);
+            margin-bottom: 15px;
+            box-shadow: 0 2px 6px var(--shadow-color);
+            width: 100%;
+            border: 1px solid var(--border-color);
+        }
+        
+        header {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            text-align: center;
+            width: 100%;
+            align-items: center;
+        }
+        
+        @media (min-width: 768px) {
+            header {
+                flex-direction: row;
+                justify-content: space-between;
+                text-align: left;
+            }
+        }
+        
+        h1 {
+            font-size: 20px;
+            color: var(--text-color);
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin: 0;
+        }
+        
+        @media (min-width: 768px) {
+            h1 { font-size: 22px; }
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+            justify-content: center;
+        }
+        
+        @media (min-width: 768px) {
+            .logo { justify-content: flex-start; }
+        }
+        
+        .logo-icon {
+            font-size: 20px;
+            color: var(--accent-color);
+            background: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 12px;
+            width: 100%;
+        }
+        
+        @media (min-width: 992px) {
+            .container {
+                display: grid;
+                grid-template-columns: 280px 1fr;
+                gap: 18px;
+                align-items: stretch;
+            }
+        }
+        
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: 0 1px 4px var(--shadow-color);
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid var(--border-color);
+            width: 100%;
+            overflow: hidden;
+            height: 100%;
+        }
+        
+        .card-title {
+            font-size: 16px;
+            margin-bottom: 12px;
+            color: var(--accent-color);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .btn-reset {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            cursor: pointer;
+            font-size: 14px;
+            margin-left: auto;
+            padding: 4px;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+        .btn-reset:hover {
+            background-color: var(--row-hover-bg);
+            transform: rotate(90deg);
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 4px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-color);
+        }
+        
+        input[type="text"], select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            transition: var(--transition);
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            font-family: 'Inter', sans-serif;
+        }
+        
+        input[type="text"]:focus, select:focus {
+            border-color: var(--accent-color);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(0, 31, 77, 0.2);
+        }
+        
+        .search-box {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 15px;
+            width: 100%;
+        }
+        
+        .search-input {
+            flex: 1;
+        }
+        
+        .btn-search {
+            background: var(--button-bg);
+            color: var(--button-text);
+            border: 1px solid var(--button-bg);
+            padding: 0 16px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 14px;
+        }
+        
+        .btn-search:hover {
+            background: var(--button-hover);
+            border-color: var(--button-hover);
+        }
+        
+        .table-container {
+            overflow-x: auto;
+            border-radius: var(--radius);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 1px 3px var(--shadow-color);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            min-width: 600px;
+        }
+        
+        thead {
+            background: var(--stat-bg);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            border-bottom: 2px solid var(--border-color);
+        }
+        
+        th {
+            padding: 10px 8px;
+            text-align: left;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        
+        th:hover { background-color: var(--row-hover-bg); }
+        
+        td {
+            padding: 8px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        tr { transition: background-color 0.2s ease; }
+        
+        #book-list tr {
+            cursor: pointer;
+        }
+
+        tr:nth-child(even) { background-color: var(--row-even-bg); }
+        tr:hover { background-color: var(--row-hover-bg); }
+        
+        .empty-state-cell {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6c757d;
+        }
+
+        .empty-state-cell i {
+            font-size: 28px;
+            margin-bottom: 10px;
+            display: block;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            padding: 15px;
+            color: #6c757d;
+            font-size: 12px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            width: 100%;
+        }
+        
+        .footer-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        /* --- STILE NOTIFICA FLUTTUANTE --- */
+        .status-message {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translate(-50%, -100px);
+            z-index: 1001;
+            width: auto;
+            max-width: 90%;
+            padding: 12px 20px;
+            border-radius: var(--radius);
+            text-align: center;
+            font-weight: 500;
+            font-size: 14px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            opacity: 0;
+            visibility: hidden;
+            transition: transform 0.4s ease-out, opacity 0.4s ease-out;
+        }
+        .status-message.show {
+            transform: translate(-50%, 0);
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .status-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status-error {
+            background-color: var(--warning-color);
+            color: white;
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .status-loading {
+            background-color: var(--stat-bg);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+        }
+
+        .loader {
+            border: 2px solid #e9ecef;
+            border-top: 2px solid var(--accent-color);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 15px auto;
+            display: none;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* --- THEME TOGGLE STYLES --- */
+        .theme-toggle {
+            position: relative;
+            width: 36px;
+            height: 36px;
+        }
+        .theme-toggle-button {
+            background: var(--stat-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 50%;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+        .theme-toggle-button:hover {
+            background: var(--row-hover-bg);
+            transform: scale(1.1);
+        }
+        .theme-toggle-button i {
+            font-size: 16px;
+            color: var(--text-color);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        .theme-icon-sun { display: none; }
+        html.dark-mode .theme-icon-sun { display: block; }
+        html.dark-mode .theme-icon-moon { display: none; }
+        
+        /* --- MODAL & RESPONSIVE STYLES --- */
+        .form-group { margin-bottom: 12px; }
+        .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+        .stat-box { background: var(--stat-bg); padding: 12px; border-radius: var(--radius-sm); text-align: center; border: 1px solid var(--border-color); }
+        .stat-value { font-size: 20px; font-weight: 700; color: var(--accent-color); margin-bottom: 2px; }
+        .stat-label { font-size: 11px; color: #6c757d; text-transform: uppercase; font-weight: 500; }
+        .footer-content { width: 100%; }
+        .highlight { color: var(--accent-color); font-weight: 600; }
+        .btn-config { padding: 10px 12px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-color); border-radius: var(--radius-sm); cursor: pointer; font-size: 14px; transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 6px; flex: 1; min-width: 100px; }
+        .btn-config:hover { background: var(--row-hover-bg); }
+        .sheets-buttons { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+        .pagination { display: flex; justify-content: center; margin-top: 15px; gap: 4px; flex-wrap: wrap; }
+        .pagination button { padding: 8px 12px; border: 1px solid var(--border-color); background-color: var(--card-bg); color: var(--text-color); border-radius: var(--radius-sm); cursor: pointer; transition: var(--transition); font-size: 13px; min-width: 36px; }
+        .pagination button:hover { background-color: var(--row-hover-bg); }
+        .pagination button.active { background: var(--accent-color); color: var(--button-text); font-weight: 600; border: 1px solid var(--accent-color); }
+        .pagination button:disabled { opacity: 0.5; cursor: not-allowed; }
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); align-items: center; justify-content: center; }
+        .modal-content { background-color: var(--card-bg); margin: auto; padding: 20px; border-radius: var(--radius); box-shadow: 0 4px 8px rgba(0,0,0,0.2); width: 90%; max-width: 600px; max-height: 80vh; overflow-y: auto; position: relative; }
+        .close { color: #6c757d; float: right; font-size: 28px; font-weight: bold; position: absolute; top: 10px; right: 15px; cursor: pointer; }
+        .footer-button { background: none; border: none; color: #6c757d; cursor: pointer; text-decoration: underline; font-size: 12px; transition: var(--transition); display: flex; align-items: center; gap: 4px; padding: 8px; font-family: 'Inter', sans-serif; }
+        .footer-button:hover { color: var(--accent-color); }
+        .sort-indicator { margin-left: 4px; font-size: 12px; }
+        .sort-indicator.active { color: var(--accent-color); }
+
+        /* Stili per la modale dei dettagli */
+        .modal-body { display: flex; gap: 20px; align-items: flex-start; }
+        .modal-cover { width: 130px; height: 190px; border-radius: var(--radius-sm); box-shadow: 0 2px 8px var(--shadow-color); object-fit: cover; flex-shrink: 0; background-color: var(--stat-bg);}
+        .modal-info { min-width: 0; }
+        .modal-info h2 { margin: 0 0 5px 0; color: var(--accent-color); font-size: 18px; }
+        .modal-info h3 { margin: 0 0 15px 0; font-weight: 400; opacity: 0.8; font-size: 14px; }
+        .modal-info h4 { font-size: 14px; margin-bottom: 8px; }
+        .tag-list { padding-left: 20px; max-height: 250px; overflow-y: auto; font-size: 13px; }
+        .tag-list li { margin-bottom: 5px; }
+
+        @media (max-width: 767px) {
+            body { padding: 8px; }
+            .container, .card, .header-container { width: 100%; gap: 12px; padding: 12px; margin-bottom: 12px;}
+            .search-box, .sheets-buttons, .footer-buttons { flex-direction: column; }
+            .stats { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 600px) {
+            .modal-body { flex-direction: column; align-items: center; text-align: center; }
+            .tag-list { text-align: left; }
+        }
+    </style>
 </head>
 <body>
-<p class="p1">&lt;!DOCTYPE html&gt;</p>
-<p class="p1">&lt;html lang="it"&gt;</p>
-<p class="p1">&lt;head&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta charset="UTF-8"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;title&gt;Catalogo Libri - Integrazione Open Library (Smart)&lt;/title&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;style&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>:root {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>/* TEMA CHIARO PREDEFINITO (DEFAULT) */</p>
-<p class="p1"><span class="Apple-converted-space">            </span>--primary-bg: #f8f9fa;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>--card-bg: #ffffff;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>--text-color: #212529;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>--accent-color: #001f4d; /* Blu scuro elegante per i libri */</p>
-<p class="p1"><span class="Apple-converted-space">            </span>--border-color: #adb5bd;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>--button-bg: #343a40;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>--button-hover: #23272b;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>--button-text: #ffffff;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>--header-bg: #ffffff;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>--stat-bg: #e9ecef;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>--shadow-color: rgba(0, 0, 0, 0.1);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>--shadow-hover: rgba(0, 0, 0, 0.15);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>--warning-color: #c82333;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>--row-even-bg: #f0f2f5;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>--row-hover-bg: #dee2e6;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>--radius: 6px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>--radius-sm: 3px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>--transition: all 0.2s ease;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>/* Override per il TEMA SCURO */</p>
-<p class="p1"><span class="Apple-converted-space">        </span>html.dark-mode {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>--primary-bg: #121212;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>--card-bg: #1e1e1e;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>--text-color: #e0e0e0;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>--accent-color: #6ab7ff;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>--border-color: #333;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>--button-bg: #555;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>--button-hover: #777;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>--header-bg: #1a1a1a;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>--stat-bg: #2d2d2d;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>--shadow-color: rgba(0, 0, 0, 0.3);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>--shadow-hover: rgba(0, 0, 0, 0.4);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>--warning-color: #f44336;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>--row-even-bg: #2a2a2a;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>--row-hover-bg: #3d3d3d;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>* { box-sizing: border-box; margin: 0; padding: 0; }</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>@keyframes fadeIn {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>from { opacity: 0; transform: translateY(5px); }</p>
-<p class="p1"><span class="Apple-converted-space">            </span>to { opacity: 1; transform: translateY(0); }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.fade-in {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>animation: fadeIn 0.4s ease-out forwards;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>html {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background-color: var(--primary-bg);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>transition: background-color 0.3s ease;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>body {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>width: 100%;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>max-width: 1400px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin: 0 auto;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 10px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: 14px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: var(--text-color);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>line-height: 1.4;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>min-height: 100vh;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: flex;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>flex-direction: column;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.main-content { flex: 1; width: 100%; }</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.header-container {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: var(--header-bg);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 12px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: var(--radius);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin-bottom: 15px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>box-shadow: 0 2px 6px var(--shadow-color);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>width: 100%;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border: 1px solid var(--border-color);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>header {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: flex;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>flex-direction: column;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>gap: 12px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>text-align: center;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>width: 100%;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>align-items: center;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>@media (min-width: 768px) {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>header {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>flex-direction: row;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>justify-content: space-between;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>text-align: left;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>h1 {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: 20px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: var(--text-color);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-weight: 600;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>letter-spacing: 0.5px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin: 0;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>@media (min-width: 768px) {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>h1 { font-size: 22px; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.logo {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: flex;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>align-items: center;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>gap: 10px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>flex: 1;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>justify-content: center;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>@media (min-width: 768px) {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>.logo { justify-content: flex-start; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.logo-icon {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: 20px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: var(--accent-color);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: none;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>width: 36px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>height: 36px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 50%;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: flex;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>align-items: center;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>justify-content: center;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.container {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: flex;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>flex-direction: column;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>gap: 15px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin-top: 12px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>width: 100%;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>@media (min-width: 992px) {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>.container {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>display: grid;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>grid-template-columns: 280px 1fr;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>gap: 18px;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>align-items: stretch;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.card {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: var(--card-bg);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: var(--radius);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>box-shadow: 0 1px 4px var(--shadow-color);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 15px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin-bottom: 15px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border: 1px solid var(--border-color);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>width: 100%;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>overflow: hidden;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>height: 100%;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.card-title {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: 16px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin-bottom: 12px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: var(--accent-color);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-weight: 600;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: flex;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>align-items: center;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>gap: 6px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding-bottom: 8px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-bottom: 1px solid var(--border-color);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.btn-reset {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: none;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border: none;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: var(--text-color);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>cursor: pointer;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: 14px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin-left: auto;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 4px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 50%;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>width: 28px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>height: 28px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: flex;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>align-items: center;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>justify-content: center;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>transition: var(--transition);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.btn-reset:hover {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background-color: var(--row-hover-bg);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>transform: rotate(90deg);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>label {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: block;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin-bottom: 4px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: 13px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-weight: 500;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: var(--text-color);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>input[type="text"], select {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>width: 100%;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 10px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border: 1px solid var(--border-color);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: var(--radius-sm);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: 13px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>transition: var(--transition);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background-color: var(--card-bg);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: var(--text-color);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-family: 'Inter', sans-serif;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>input[type="text"]:focus, select:focus {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-color: var(--accent-color);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>outline: none;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>box-shadow: 0 0 0 2px rgba(0, 31, 77, 0.2);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.search-box {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: flex;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>gap: 6px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin-bottom: 15px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>width: 100%;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.search-input {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>flex: 1;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.btn-search {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: var(--button-bg);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: var(--button-text);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border: 1px solid var(--button-bg);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 0 16px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: var(--radius-sm);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>cursor: pointer;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>transition: var(--transition);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: 14px;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.btn-search:hover {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: var(--button-hover);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-color: var(--button-hover);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.table-container {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>overflow-x: auto;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: var(--radius);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border: 1px solid var(--border-color);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>box-shadow: 0 1px 3px var(--shadow-color);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>table {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>width: 100%;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-collapse: collapse;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: 13px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>min-width: 600px;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>thead {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: var(--stat-bg);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>position: sticky;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>top: 0;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>z-index: 10;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-bottom: 2px solid var(--border-color);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>th {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 10px 8px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>text-align: left;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-weight: 600;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>cursor: pointer;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>white-space: nowrap;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>th:hover { background-color: var(--row-hover-bg); }</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>td {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 8px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-bottom: 1px solid var(--border-color);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>tr { transition: background-color 0.2s ease; }</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>#book-list tr {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>cursor: pointer;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>tr:nth-child(even) { background-color: var(--row-even-bg); }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>tr:hover { background-color: var(--row-hover-bg); }</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.empty-state-cell {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>text-align: center;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 40px 20px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: #6c757d;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.empty-state-cell i {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: 28px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin-bottom: 10px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: block;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.footer {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>text-align: center;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin-top: 20px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 15px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: #6c757d;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: 12px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-top: 1px solid var(--border-color);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: flex;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>flex-direction: column;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>align-items: center;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>gap: 15px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>width: 100%;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.footer-buttons {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: flex;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>justify-content: center;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>gap: 15px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>flex-wrap: wrap;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>/* --- STILE NOTIFICA FLUTTUANTE --- */</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.status-message {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>position: fixed;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>top: 20px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>left: 50%;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>transform: translate(-50%, -100px);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>z-index: 1001;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>width: auto;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>max-width: 90%;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 12px 20px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: var(--radius);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>text-align: center;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-weight: 500;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: 14px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>box-shadow: 0 4px 12px rgba(0,0,0,0.15);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>opacity: 0;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>visibility: hidden;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>transition: transform 0.4s ease-out, opacity 0.4s ease-out;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.status-message.show {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>transform: translate(-50%, 0);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>opacity: 1;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>visibility: visible;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.status-success {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background-color: #d4edda;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: #155724;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border: 1px solid #c3e6cb;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.status-error {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background-color: var(--warning-color);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: white;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border: 1px solid rgba(0,0,0,0.1);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.status-loading {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background-color: var(--stat-bg);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: var(--text-color);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border: 1px solid var(--border-color);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.loader {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border: 2px solid #e9ecef;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-top: 2px solid var(--accent-color);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 50%;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>width: 30px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>height: 30px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>animation: spin 1s linear infinite;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin: 15px auto;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: none;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>@keyframes spin {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>0% { transform: rotate(0deg); }</p>
-<p class="p1"><span class="Apple-converted-space">            </span>100% { transform: rotate(360deg); }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>/* --- THEME TOGGLE STYLES --- */</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.theme-toggle {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>position: relative;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>width: 36px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>height: 36px;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.theme-toggle-button {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: var(--stat-bg);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border: 1px solid var(--border-color);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 50%;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>width: 100%;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>height: 100%;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>cursor: pointer;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: flex;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>align-items: center;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>justify-content: center;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>transition: var(--transition);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.theme-toggle-button:hover {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: var(--row-hover-bg);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>transform: scale(1.1);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.theme-toggle-button i {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: 16px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: var(--text-color);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>transition: opacity 0.3s ease, transform 0.3s ease;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.theme-icon-sun { display: none; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>html.dark-mode .theme-icon-sun { display: block; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>html.dark-mode .theme-icon-moon { display: none; }</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>/* --- MODAL &amp; RESPONSIVE STYLES --- */</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.form-group { margin-bottom: 12px; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.stat-box { background: var(--stat-bg); padding: 12px; border-radius: var(--radius-sm); text-align: center; border: 1px solid var(--border-color); }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.stat-value { font-size: 20px; font-weight: 700; color: var(--accent-color); margin-bottom: 2px; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.stat-label { font-size: 11px; color: #6c757d; text-transform: uppercase; font-weight: 500; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.footer-content { width: 100%; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.highlight { color: var(--accent-color); font-weight: 600; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.btn-config { padding: 10px 12px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-color); border-radius: var(--radius-sm); cursor: pointer; font-size: 14px; transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 6px; flex: 1; min-width: 100px; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.btn-config:hover { background: var(--row-hover-bg); }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.sheets-buttons { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.pagination { display: flex; justify-content: center; margin-top: 15px; gap: 4px; flex-wrap: wrap; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.pagination button { padding: 8px 12px; border: 1px solid var(--border-color); background-color: var(--card-bg); color: var(--text-color); border-radius: var(--radius-sm); cursor: pointer; transition: var(--transition); font-size: 13px; min-width: 36px; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.pagination button:hover { background-color: var(--row-hover-bg); }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.pagination button.active { background: var(--accent-color); color: var(--button-text); font-weight: 600; border: 1px solid var(--accent-color); }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.pagination button:disabled { opacity: 0.5; cursor: not-allowed; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); align-items: center; justify-content: center; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.modal-content { background-color: var(--card-bg); margin: auto; padding: 20px; border-radius: var(--radius); box-shadow: 0 4px 8px rgba(0,0,0,0.2); width: 90%; max-width: 600px; max-height: 80vh; overflow-y: auto; position: relative; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.close { color: #6c757d; float: right; font-size: 28px; font-weight: bold; position: absolute; top: 10px; right: 15px; cursor: pointer; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.footer-button { background: none; border: none; color: #6c757d; cursor: pointer; text-decoration: underline; font-size: 12px; transition: var(--transition); display: flex; align-items: center; gap: 4px; padding: 8px; font-family: 'Inter', sans-serif; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.footer-button:hover { color: var(--accent-color); }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.sort-indicator { margin-left: 4px; font-size: 12px; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.sort-indicator.active { color: var(--accent-color); }</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>/* Stili per la modale dei dettagli */</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.modal-body { display: flex; gap: 20px; align-items: flex-start; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.modal-cover { width: 130px; height: 190px; border-radius: var(--radius-sm); box-shadow: 0 2px 8px var(--shadow-color); object-fit: cover; flex-shrink: 0; background-color: var(--stat-bg);}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.modal-info { min-width: 0; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.modal-info h2 { margin: 0 0 5px 0; color: var(--accent-color); font-size: 18px; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.modal-info h3 { margin: 0 0 15px 0; font-weight: 400; opacity: 0.8; font-size: 14px; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.modal-info h4 { font-size: 14px; margin-bottom: 8px; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.tag-list { padding-left: 20px; max-height: 250px; overflow-y: auto; font-size: 13px; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.tag-list li { margin-bottom: 5px; }</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>@media (max-width: 767px) {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>body { padding: 8px; }</p>
-<p class="p1"><span class="Apple-converted-space">            </span>.container, .card, .header-container { width: 100%; gap: 12px; padding: 12px; margin-bottom: 12px;}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>.search-box, .sheets-buttons, .footer-buttons { flex-direction: column; }</p>
-<p class="p1"><span class="Apple-converted-space">            </span>.stats { grid-template-columns: 1fr; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>@media (max-width: 600px) {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>.modal-body { flex-direction: column; align-items: center; text-align: center; }</p>
-<p class="p1"><span class="Apple-converted-space">            </span>.tag-list { text-align: left; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/style&gt;</p>
-<p class="p1">&lt;/head&gt;</p>
-<p class="p1">&lt;body&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="main-content"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="header-container"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;header&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="logo"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="logo-icon"&gt;&lt;i class="fas fa-book"&gt;&lt;/i&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;h1&gt;Catalogo Libri&lt;/h1&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="theme-toggle"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;button id="theme-toggle-button" class="theme-toggle-button" aria-label="Cambia tema"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;i class="fas fa-moon theme-icon-moon"&gt;&lt;/i&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;i class="fas fa-sun theme-icon-sun"&gt;&lt;/i&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/header&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div id="status-message" class="status-message"&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div id="loader" class="loader"&gt;&lt;/div&gt;</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="container"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="left-column"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="card"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;h2 class="card-title"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;i class="fas fa-search"&gt;&lt;/i&gt; Cerca e Filtra</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;button id="reset-filters-button" class="btn-reset" title="Resetta filtri"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>&lt;i class="fas fa-sync-alt"&gt;&lt;/i&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/h2&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="search-box"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;input type="text" id="search-input" class="search-input" placeholder="Cerca per titolo, autore..."&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;button class="btn-search" id="search-button"&gt;&lt;i class="fas fa-search"&gt;&lt;/i&gt;&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="form-group"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;label for="filter-genre"&gt;Filtra per genere&lt;/label&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;select id="filter-genre"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>&lt;option value=""&gt;Tutti i generi&lt;/option&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>&lt;option value="Romanzo"&gt;Romanzo&lt;/option&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>&lt;option value="Giallo/Thriller"&gt;Giallo/Thriller&lt;/option&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>&lt;option value="Fantasy/Sci-Fi"&gt;Fantasy/Sci-Fi&lt;/option&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>&lt;option value="Saggistica"&gt;Saggistica&lt;/option&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>&lt;option value="Storico"&gt;Storico&lt;/option&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>&lt;option value="Biografia"&gt;Biografia&lt;/option&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>&lt;option value="Classici"&gt;Classici&lt;/option&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>&lt;option value="Horror"&gt;Horror&lt;/option&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>&lt;option value="Poesia"&gt;Poesia&lt;/option&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>&lt;option value="Fumetti"&gt;Fumetti/Graphic Novel&lt;/option&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>&lt;option value="Altro"&gt;Altro&lt;/option&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/select&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="form-group"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;label for="filter-year"&gt;Filtra per anno&lt;/label&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;select id="filter-year"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>&lt;option value=""&gt;Tutti gli anni&lt;/option&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>&lt;option value="2020s"&gt;2020-oggi&lt;/option&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>&lt;option value="2010s"&gt;2010-2019&lt;/option&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>&lt;option value="2000s"&gt;2000-2009&lt;/option&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>&lt;option value="1990s"&gt;1990-1999&lt;/option&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>&lt;option value="1980s"&gt;1980-1989&lt;/option&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>&lt;option value="1970s"&gt;1970-1979&lt;/option&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>&lt;option value="1960s"&gt;1960-1969&lt;/option&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>&lt;option value="1950s"&gt;1950-1959&lt;/option&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>&lt;option value="pre1950"&gt;Prima del 1950&lt;/option&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/select&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="stats"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div class="stat-box"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div class="stat-value" id="total-books"&gt;0&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div class="stat-label"&gt;Libri Totali&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div class="stat-box"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div class="stat-value" id="unique-authors"&gt;0&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div class="stat-label"&gt;Autori&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="right-column"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="card"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;h2 class="card-title"&gt;&lt;i class="fas fa-list"&gt;&lt;/i&gt; Elenco Libri&lt;/h2&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="table-container"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;table id="book-table"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>&lt;thead&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                </span>&lt;tr&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;th data-sort="title"&gt;Titolo &lt;span class="sort-indicator" id="sort-title"&gt;&lt;/span&gt;&lt;/th&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;th data-sort="author"&gt;Autore &lt;span class="sort-indicator" id="sort-author"&gt;&lt;/span&gt;&lt;/th&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;th data-sort="year"&gt;Anno &lt;span class="sort-indicator" id="sort-year"&gt;&lt;/span&gt;&lt;/th&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;th data-sort="genre"&gt;Genere &lt;span class="sort-indicator" id="sort-genre"&gt;&lt;/span&gt;&lt;/th&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                </span>&lt;/tr&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/thead&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>&lt;tbody id="book-list"&gt;&lt;/tbody&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/table&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div id="pagination" class="pagination"&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p2"><span class="Apple-converted-space">    </span></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="footer"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="footer-content"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;p&gt;Catalogo Libri © 2025 - Integrazione Open Library &amp; Google Sheets&lt;/p&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="footer-buttons"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;button class="footer-button" id="config-toggle-button"&gt;&lt;i class="fas fa-cog"&gt;&lt;/i&gt; Configurazione&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p2"><span class="Apple-converted-space">    </span></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div id="config-modal" class="modal"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="modal-content"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;span class="close" id="close-config"&gt;&amp;times;&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;h2&gt;&lt;i class="fas fa-cog"&gt;&lt;/i&gt; Configurazione Google Sheets&lt;/h2&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="form-group"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;label for="inline-sheets-url"&gt;URL Google Sheet (CSV Pubblicato):&lt;/label&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;input type="text" id="inline-sheets-url" placeholder="https://docs.google.com/spreadsheets/d/..."&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="sheets-buttons"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;button class="btn-config" id="inline-save-sheets-url"&gt;&lt;i class="fas fa-save"&gt;&lt;/i&gt; Salva&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;button class="btn-config" id="inline-import-sheets"&gt;&lt;i class="fas fa-download"&gt;&lt;/i&gt; Importa&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;button class="btn-config btn-remove" id="inline-remove-sheets-url"&gt;&lt;i class="fas fa-trash"&gt;&lt;/i&gt; Rimuovi&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;p style="font-size: 11px; color: #888; margin-top: 10px;"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>*Formato CSV richiesto: Titolo, Autore, Anno, Genere</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/p&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div id="details-modal" class="modal"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="modal-content" id="details-modal-content"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;span class="close" id="close-details"&gt;&amp;times;&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="modal-body"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;img src="" alt="Copertina Libro" class="modal-cover" id="modal-cover-art"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="modal-info"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;h2 id="modal-book-title"&gt;&lt;/h2&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;h3 id="modal-book-author"&gt;&lt;/h3&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;h4&gt;Soggetti / Argomenti:&lt;/h4&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;ul id="modal-tag-list" class="tag-list"&gt;&lt;/ul&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p2"><span class="Apple-converted-space">    </span></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;script&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>document.addEventListener('DOMContentLoaded', function() {</p>
-<p class="p1"><span class="Apple-converted-space">        </span>// --- VARIABILI GLOBALI ---</p>
-<p class="p1"><span class="Apple-converted-space">        </span>let books = [];</p>
-<p class="p1"><span class="Apple-converted-space">        </span>let filteredBooks = [];</p>
-<p class="p1"><span class="Apple-converted-space">        </span>let sortState = { field: 'title', direction: 1 };</p>
-<p class="p1"><span class="Apple-converted-space">        </span>let currentPage = 1;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const itemsPerPage = 10;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>let statusTimeout;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>// --- ELEMENTI DOM ---</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const dom = {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>bookList: document.getElementById('book-list'),</p>
-<p class="p1"><span class="Apple-converted-space">            </span>searchInput: document.getElementById('search-input'),</p>
-<p class="p1"><span class="Apple-converted-space">            </span>searchButton: document.getElementById('search-button'),</p>
-<p class="p1"><span class="Apple-converted-space">            </span>totalBooks: document.getElementById('total-books'),</p>
-<p class="p1"><span class="Apple-converted-space">            </span>uniqueAuthors: document.getElementById('unique-authors'),</p>
-<p class="p1"><span class="Apple-converted-space">            </span>statusMessage: document.getElementById('status-message'),</p>
-<p class="p1"><span class="Apple-converted-space">            </span>loader: document.getElementById('loader'),</p>
-<p class="p1"><span class="Apple-converted-space">            </span>pagination: document.getElementById('pagination'),</p>
-<p class="p1"><span class="Apple-converted-space">            </span>filterGenre: document.getElementById('filter-genre'),</p>
-<p class="p1"><span class="Apple-converted-space">            </span>filterYear: document.getElementById('filter-year'),</p>
-<p class="p1"><span class="Apple-converted-space">            </span>themeToggleButton: document.getElementById('theme-toggle-button'),</p>
-<p class="p1"><span class="Apple-converted-space">            </span>resetFiltersButton: document.getElementById('reset-filters-button'),</p>
-<p class="p1"><span class="Apple-converted-space">            </span>configModal: document.getElementById('config-modal'),</p>
-<p class="p1"><span class="Apple-converted-space">            </span>configToggleButton: document.getElementById('config-toggle-button'),</p>
-<p class="p1"><span class="Apple-converted-space">            </span>closeConfig: document.getElementById('close-config'),</p>
-<p class="p1"><span class="Apple-converted-space">            </span>sheetsUrlInput: document.getElementById('inline-sheets-url'),</p>
-<p class="p1"><span class="Apple-converted-space">            </span>saveUrlBtn: document.getElementById('inline-save-sheets-url'),</p>
-<p class="p1"><span class="Apple-converted-space">            </span>importBtn: document.getElementById('inline-import-sheets'),</p>
-<p class="p1"><span class="Apple-converted-space">            </span>removeUrlBtn: document.getElementById('inline-remove-sheets-url'),</p>
-<p class="p1"><span class="Apple-converted-space">            </span>detailsModal: document.getElementById('details-modal'),</p>
-<p class="p1"><span class="Apple-converted-space">            </span>closeDetails: document.getElementById('close-details'),</p>
-<p class="p1"><span class="Apple-converted-space">            </span>modalCoverArt: document.getElementById('modal-cover-art'),</p>
-<p class="p1"><span class="Apple-converted-space">            </span>modalBookTitle: document.getElementById('modal-book-title'),</p>
-<p class="p1"><span class="Apple-converted-space">            </span>modalBookAuthor: document.getElementById('modal-book-author'),</p>
-<p class="p1"><span class="Apple-converted-space">            </span>modalTagList: document.getElementById('modal-tag-list')</p>
-<p class="p1"><span class="Apple-converted-space">        </span>};</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>// --- FUNZIONI UTILITY ---</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const showStatus = (message, type = 'success', duration = 5000) =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>clearTimeout(statusTimeout);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const icons = {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>success: 'fa-check-circle',</p>
-<p class="p1"><span class="Apple-converted-space">                </span>error: 'fa-exclamation-triangle',</p>
-<p class="p1"><span class="Apple-converted-space">                </span>loading: 'fa-sync fa-spin'</p>
-<p class="p1"><span class="Apple-converted-space">            </span>};</p>
-<p class="p1"><span class="Apple-converted-space">            </span>dom.statusMessage.innerHTML = `&lt;i class="fas ${icons[type]}"&gt;&lt;/i&gt; ${message}`;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>dom.statusMessage.className = `status-message status-${type}`;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>dom.statusMessage.classList.add('show');</p>
-<p class="p1"><span class="Apple-converted-space">            </span>if (duration !== null) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>statusTimeout = setTimeout(() =&gt; dom.statusMessage.classList.remove('show'), duration);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>};</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>const hideStatus = () =&gt; dom.statusMessage.classList.remove('show');</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>const debounce = (func, delay) =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>let timeout;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>return (...args) =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>clearTimeout(timeout);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>timeout = setTimeout(() =&gt; func.apply(this, args), delay);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>};</p>
-<p class="p1"><span class="Apple-converted-space">        </span>};</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>// =================================================================</p>
-<p class="p1"><span class="Apple-converted-space">        </span>// FUNZIONE OPEN LIBRARY API (Per Libri)</p>
-<p class="p1"><span class="Apple-converted-space">        </span>// =================================================================</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const getBookDetails = async (author, title) =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>// Usa Open Library API (Gratuita, nessuna Key necessaria)</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const searchQuery = `title:${encodeURIComponent(title)} author:${encodeURIComponent(author)}`;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const url = `https://openlibrary.org/search.json?q=${searchQuery}&amp;limit=1`;</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>try {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const response = await fetch(url);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>if (!response.ok) throw new Error("Errore Network Open Library");</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const data = await response.json();</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">                </span>if (data.numFound === 0 || !data.docs || data.docs.length === 0) {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>return null;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">                </span>const book = data.docs[0];</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const coverId = book.cover_i;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const coverUrl = coverId<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">                    </span>? `https://covers.openlibrary.org/b/id/${coverId}-L.jpg`<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">                    </span>: null;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">                </span>// Open Library restituisce 'subject' che sono i tag/generi/argomenti</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const tags = book.subject ? book.subject.slice(0, 10) : []; // Prendiamo i primi 10</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">                </span>return {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>cover: coverUrl,</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>tags: tags,</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>key: book.key // Identificativo Open Library</p>
-<p class="p1"><span class="Apple-converted-space">                </span>};</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>} catch (error) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>console.error("Errore Open Library:", error);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>return null;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>};</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>const renderBooks = () =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>filteredBooks.sort((a, b) =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const valA = a[sortState.field];</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const valB = b[sortState.field];</p>
-<p class="p1"><span class="Apple-converted-space">                </span>let comparison = typeof valA === 'number' &amp;&amp; typeof valB === 'number'<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">                    </span>? valA - valB<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">                    </span>: String(valA).localeCompare(String(valB), 'it', { sensitivity: 'base' });</p>
-<p class="p1"><span class="Apple-converted-space">                </span>return comparison * sortState.direction;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>});</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>const totalPages = Math.ceil(filteredBooks.length / itemsPerPage);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const startIndex = (currentPage - 1) * itemsPerPage;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const paginatedBooks = filteredBooks.slice(startIndex, startIndex + itemsPerPage);</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>dom.bookList.innerHTML = '';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>if (paginatedBooks.length === 0) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>dom.bookList.innerHTML = `&lt;tr&gt;&lt;td colspan="4" class="empty-state-cell"&gt;&lt;i class="fas fa-book"&gt;&lt;/i&gt;Nessun libro trovato.&lt;/td&gt;&lt;/tr&gt;`;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>} else {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>paginatedBooks.forEach(book =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>const row = document.createElement('tr');</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>row.className = 'fade-in';</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>row.setAttribute('data-author', book.author);</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>row.setAttribute('data-title', book.title);</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>row.innerHTML = `&lt;td&gt;${book.title}&lt;/td&gt;&lt;td&gt;${book.author}&lt;/td&gt;&lt;td&gt;${book.year || ''}&lt;/td&gt;&lt;td&gt;${book.genre}&lt;/td&gt;`;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>dom.bookList.appendChild(row);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>});</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>updateSortIndicators();</p>
-<p class="p1"><span class="Apple-converted-space">            </span>updatePagination(totalPages);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>updateStats();</p>
-<p class="p1"><span class="Apple-converted-space">        </span>};</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>const applyFiltersAndSearch = () =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const searchTerm = dom.searchInput.value.toLowerCase();</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const genreFilter = dom.filterGenre.value;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const yearFilter = dom.filterYear.value;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>filteredBooks = books.filter(book =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const matchesSearch = searchTerm ?<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">                    </span>['title', 'author', 'genre'].some(field =&gt; String(book[field]).toLowerCase().includes(searchTerm)) ||<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">                    </span>String(book.year).includes(searchTerm) : true;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const matchesGenre = genreFilter ? book.genre === genreFilter : true;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>let matchesYear = true;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>if (yearFilter) {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>const year = book.year;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>const ranges = {</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>'2020s': [2020, new Date().getFullYear()], '2010s': [2010, 2019], '2000s': [2000, 2009],</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>'1990s': [1990, 1999], '1980s': [1980, 1989], '1970s': [1970, 1979], '1960s': [1960, 1969],</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>'1950s': [1950, 1959], 'pre1950': [0, 1949]</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>};</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>if (ranges[yearFilter]) {</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>matchesYear = year &gt;= ranges[yearFilter][0] &amp;&amp; year &lt;= ranges[yearFilter][1];</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">                </span>}</p>
-<p class="p1"><span class="Apple-converted-space">                </span>return matchesSearch &amp;&amp; matchesGenre &amp;&amp; matchesYear;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>});</p>
-<p class="p1"><span class="Apple-converted-space">            </span>currentPage = 1;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>renderBooks();</p>
-<p class="p1"><span class="Apple-converted-space">        </span>};</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>const resetFilters = () =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>dom.searchInput.value = '';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>dom.filterGenre.selectedIndex = 0;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>dom.filterYear.selectedIndex = 0;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>applyFiltersAndSearch();</p>
-<p class="p1"><span class="Apple-converted-space">            </span>showStatus("Filtri resettati.");</p>
-<p class="p1"><span class="Apple-converted-space">        </span>};</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>const updateStats = () =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>dom.totalBooks.textContent = books.length;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>dom.uniqueAuthors.textContent = new Set(books.map(b =&gt; b.author)).size;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>};</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>const updateSortIndicators = () =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>document.querySelectorAll('th[data-sort]').forEach(th =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const field = th.dataset.sort;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const indicator = th.querySelector('.sort-indicator');</p>
-<p class="p1"><span class="Apple-converted-space">                </span>indicator.textContent = '';</p>
-<p class="p1"><span class="Apple-converted-space">                </span>indicator.classList.remove('active');</p>
-<p class="p1"><span class="Apple-converted-space">                </span>if (field === sortState.field) {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>indicator.textContent = sortState.direction === 1 ? '▲' : '▼';</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>indicator.classList.add('active');</p>
-<p class="p1"><span class="Apple-converted-space">                </span>}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>});</p>
-<p class="p1"><span class="Apple-converted-space">        </span>};</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>const updatePagination = (totalPages) =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>dom.pagination.innerHTML = '';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>if (totalPages &lt;= 1) return;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>for (let i = 1; i &lt;= totalPages; i++) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const btn = document.createElement('button');</p>
-<p class="p1"><span class="Apple-converted-space">                </span>btn.textContent = i;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>if (i === currentPage) btn.classList.add('active');</p>
-<p class="p1"><span class="Apple-converted-space">                </span>btn.addEventListener('click', () =&gt; { currentPage = i; renderBooks(); });</p>
-<p class="p1"><span class="Apple-converted-space">                </span>dom.pagination.appendChild(btn);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>};</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>const parseCsv = (text) =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const lines = text.trim().split('\n').slice(1);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>return lines.map(line =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>// CSV Atteso: Title, Author, Year, Genre</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const [title, author, year, genre] = line.split(',').map(v =&gt; v.trim().replace(/^"|"$/g, ''));</p>
-<p class="p1"><span class="Apple-converted-space">                </span>return { title, author, year: parseInt(year) || 0, genre };</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}).filter(b =&gt; b.title &amp;&amp; b.author);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>};</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>const importFromUrl = async (isAuto = false) =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const url = dom.sheetsUrlInput.value.trim();</p>
-<p class="p1"><span class="Apple-converted-space">            </span>if (!url) { if (!isAuto) showStatus('Inserisci un URL valido.', 'error'); return; }</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const loadingMessage = isAuto ? 'Aggiornamento automatico...' : 'Importazione...';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>showStatus(loadingMessage, 'loading', null);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>dom.loader.style.display = 'block';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>try {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const response = await fetch(url + `&amp;t=${Date.now()}`);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>if (!response.ok) throw new Error(`Errore HTTP: ${response.status}`);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const csvText = await response.text();</p>
-<p class="p1"><span class="Apple-converted-space">                </span>books = parseCsv(csvText);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>localStorage.setItem('books', JSON.stringify(books));</p>
-<p class="p1"><span class="Apple-converted-space">                </span>applyFiltersAndSearch();</p>
-<p class="p1"><span class="Apple-converted-space">                </span>showStatus(`Importati ${books.length} Libri con successo!`, 'success');</p>
-<p class="p1"><span class="Apple-converted-space">            </span>} catch (error) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>showStatus(`Errore importazione: ${error.message}`, 'error');</p>
-<p class="p1"><span class="Apple-converted-space">                </span>loadFromStorage();</p>
-<p class="p1"><span class="Apple-converted-space">            </span>} finally {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>dom.loader.style.display = 'none';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>};</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>const loadFromStorage = () =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>try {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const storedBooks = localStorage.getItem('books');</p>
-<p class="p1"><span class="Apple-converted-space">                </span>books = storedBooks ? JSON.parse(storedBooks) : [];</p>
-<p class="p1"><span class="Apple-converted-space">                </span>applyFiltersAndSearch();</p>
-<p class="p1"><span class="Apple-converted-space">            </span>} catch {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>showStatus('Dati locali corrotti.', 'error');</p>
-<p class="p1"><span class="Apple-converted-space">                </span>books = [];</p>
-<p class="p1"><span class="Apple-converted-space">                </span>applyFiltersAndSearch();</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>};</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>const applyTheme = (theme) =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>document.documentElement.classList.toggle('dark-mode', theme === 'dark');</p>
-<p class="p1"><span class="Apple-converted-space">            </span>localStorage.setItem('theme', theme);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>};</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>// --- SETUP EVENTI ---</p>
-<p class="p1"><span class="Apple-converted-space">        </span>dom.themeToggleButton.addEventListener('click', () =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const newTheme = document.documentElement.classList.contains('dark-mode') ? 'light' : 'dark';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>applyTheme(newTheme);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>});</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>dom.searchButton.addEventListener('click', applyFiltersAndSearch);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>dom.searchInput.addEventListener('input', debounce(applyFiltersAndSearch, 300));</p>
-<p class="p1"><span class="Apple-converted-space">        </span>dom.filterGenre.addEventListener('change', applyFiltersAndSearch);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>dom.filterYear.addEventListener('change', applyFiltersAndSearch);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>dom.resetFiltersButton.addEventListener('click', resetFilters);</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>document.querySelector('thead').addEventListener('click', (e) =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const th = e.target.closest('th[data-sort]');</p>
-<p class="p1"><span class="Apple-converted-space">            </span>if (!th) return;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const field = th.dataset.sort;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>if(sortState.field === field) {</p>
-<p class="p1"><span class="Apple-converted-space">               </span>sortState.direction *= -1;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>} else {</p>
-<p class="p1"><span class="Apple-converted-space">               </span>sortState.field = field;</p>
-<p class="p1"><span class="Apple-converted-space">               </span>sortState.direction = 1;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>renderBooks();</p>
-<p class="p1"><span class="Apple-converted-space">        </span>});</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>dom.configToggleButton.addEventListener('click', () =&gt; dom.configModal.style.display = 'flex');</p>
-<p class="p1"><span class="Apple-converted-space">        </span>dom.closeConfig.addEventListener('click', () =&gt; dom.configModal.style.display = 'none');</p>
-<p class="p1"><span class="Apple-converted-space">        </span>dom.saveUrlBtn.addEventListener('click', () =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>localStorage.setItem('sheetsUrl', dom.sheetsUrlInput.value);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>showStatus('URL salvato!', 'success');</p>
-<p class="p1"><span class="Apple-converted-space">            </span>dom.configModal.style.display = 'none';</p>
-<p class="p1"><span class="Apple-converted-space">        </span>});</p>
-<p class="p1"><span class="Apple-converted-space">        </span>dom.removeUrlBtn.addEventListener('click', () =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>localStorage.removeItem('sheetsUrl');</p>
-<p class="p1"><span class="Apple-converted-space">            </span>dom.sheetsUrlInput.value = '';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>showStatus('URL rimosso.');</p>
-<p class="p1"><span class="Apple-converted-space">        </span>});</p>
-<p class="p1"><span class="Apple-converted-space">        </span>dom.importBtn.addEventListener('click', () =&gt; importFromUrl(false));</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>dom.bookList.addEventListener('click', async (e) =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const row = e.target.closest('tr');</p>
-<p class="p1"><span class="Apple-converted-space">            </span>if (!row || !row.dataset.author) return;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const author = row.dataset.author;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const title = row.dataset.title;</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>showStatus('Ricerca su Open Library...', 'loading', null);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const details = await getBookDetails(author, title);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>hideStatus();</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>dom.modalBookTitle.textContent = title;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>dom.modalBookAuthor.textContent = author;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>dom.modalCoverArt.src = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs='; // Reset image</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>dom.modalTagList.innerHTML = '';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>if (details) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>if (details.cover) {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>dom.modalCoverArt.src = details.cover;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>}</p>
-<p class="p2"><span class="Apple-converted-space">                </span></p>
-<p class="p1"><span class="Apple-converted-space">                </span>if (details.tags &amp;&amp; details.tags.length &gt; 0) {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>details.tags.forEach(tag =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>const li = document.createElement('li');</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>li.textContent = tag;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>dom.modalTagList.appendChild(li);</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>});</p>
-<p class="p1"><span class="Apple-converted-space">                </span>} else {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>dom.modalTagList.innerHTML = '&lt;li&gt;Nessun tag/soggetto disponibile.&lt;/li&gt;';</p>
-<p class="p1"><span class="Apple-converted-space">                </span>}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>} else {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>dom.modalTagList.innerHTML = '&lt;li&gt;Dettagli non trovati su Open Library.&lt;/li&gt;';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>dom.detailsModal.style.display = 'flex';</p>
-<p class="p1"><span class="Apple-converted-space">        </span>});</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>dom.closeDetails.addEventListener('click', () =&gt; dom.detailsModal.style.display = 'none');</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>window.addEventListener('click', (e) =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>if (e.target === dom.configModal) dom.configModal.style.display = 'none';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>if (e.target === dom.detailsModal) dom.detailsModal.style.display = 'none';</p>
-<p class="p1"><span class="Apple-converted-space">        </span>});</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>// --- INIZIALIZZAZIONE ---</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const init = () =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>applyTheme(localStorage.getItem('theme') || 'light');</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const savedUrl = localStorage.getItem('sheetsUrl');</p>
-<p class="p1"><span class="Apple-converted-space">            </span>if (savedUrl) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>dom.sheetsUrlInput.value = savedUrl;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>importFromUrl(true);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>} else {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>loadFromStorage();</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>};</p>
-<p class="p1"><span class="Apple-converted-space">        </span>init();</p>
-<p class="p1"><span class="Apple-converted-space">    </span>});</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/script&gt;</p>
-<p class="p1">&lt;/body&gt;</p>
-<p class="p1">&lt;/html&gt;</p>
+    <div class="main-content">
+        <div class="header-container">
+            <header>
+                <div class="logo">
+                    <div class="logo-icon"><i class="fas fa-book"></i></div>
+                    <h1>Catalogo Libri</h1>
+                </div>
+                <div class="theme-toggle">
+                    <button id="theme-toggle-button" class="theme-toggle-button" aria-label="Cambia tema">
+                        <i class="fas fa-moon theme-icon-moon"></i>
+                        <i class="fas fa-sun theme-icon-sun"></i>
+                    </button>
+                </div>
+            </header>
+        </div>
+        
+        <div id="status-message" class="status-message"></div>
+        <div id="loader" class="loader"></div>
+        
+        <div class="container">
+            <div class="left-column">
+                <div class="card">
+                    <h2 class="card-title">
+                        <i class="fas fa-search"></i> Cerca e Filtra
+                        <button id="reset-filters-button" class="btn-reset" title="Resetta filtri">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </h2>
+                    <div class="search-box">
+                        <input type="text" id="search-input" class="search-input" placeholder="Cerca per titolo, autore...">
+                        <button class="btn-search" id="search-button"><i class="fas fa-search"></i></button>
+                    </div>
+                    <div class="form-group">
+                        <label for="filter-genre">Filtra per genere</label>
+                        <select id="filter-genre">
+                            <option value="">Tutti i generi</option>
+                            <option value="Romanzo">Romanzo</option>
+                            <option value="Giallo/Thriller">Giallo/Thriller</option>
+                            <option value="Fantasy/Sci-Fi">Fantasy/Sci-Fi</option>
+                            <option value="Saggistica">Saggistica</option>
+                            <option value="Storico">Storico</option>
+                            <option value="Biografia">Biografia</option>
+                            <option value="Classici">Classici</option>
+                            <option value="Horror">Horror</option>
+                            <option value="Poesia">Poesia</option>
+                            <option value="Fumetti">Fumetti/Graphic Novel</option>
+                            <option value="Altro">Altro</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="filter-year">Filtra per anno</label>
+                        <select id="filter-year">
+                            <option value="">Tutti gli anni</option>
+                            <option value="2020s">2020-oggi</option>
+                            <option value="2010s">2010-2019</option>
+                            <option value="2000s">2000-2009</option>
+                            <option value="1990s">1990-1999</option>
+                            <option value="1980s">1980-1989</option>
+                            <option value="1970s">1970-1979</option>
+                            <option value="1960s">1960-1969</option>
+                            <option value="1950s">1950-1959</option>
+                            <option value="pre1950">Prima del 1950</option>
+                        </select>
+                    </div>
+                    <div class="stats">
+                        <div class="stat-box">
+                            <div class="stat-value" id="total-books">0</div>
+                            <div class="stat-label">Libri Totali</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-value" id="unique-authors">0</div>
+                            <div class="stat-label">Autori</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="right-column">
+                <div class="card">
+                    <h2 class="card-title"><i class="fas fa-list"></i> Elenco Libri</h2>
+                    <div class="table-container">
+                        <table id="book-table">
+                            <thead>
+                                <tr>
+                                    <th data-sort="title">Titolo <span class="sort-indicator" id="sort-title"></span></th>
+                                    <th data-sort="author">Autore <span class="sort-indicator" id="sort-author"></span></th>
+                                    <th data-sort="year">Anno <span class="sort-indicator" id="sort-year"></span></th>
+                                    <th data-sort="genre">Genere <span class="sort-indicator" id="sort-genre"></span></th>
+                                </tr>
+                            </thead>
+                            <tbody id="book-list"></tbody>
+                        </table>
+                    </div>
+                    <div id="pagination" class="pagination"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <div class="footer-content">
+            <p>Catalogo Libri © 2025 - Integrazione Open Library & Google Sheets</p>
+        </div>
+        <div class="footer-buttons">
+            <button class="footer-button" id="config-toggle-button"><i class="fas fa-cog"></i> Configurazione</button>
+        </div>
+    </div>
+    
+    <div id="config-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="close-config">&times;</span>
+            <h2><i class="fas fa-cog"></i> Configurazione Google Sheets</h2>
+            <div class="form-group">
+                <label for="inline-sheets-url">URL Google Sheet (CSV Pubblicato):</label>
+                <input type="text" id="inline-sheets-url" placeholder="https://docs.google.com/spreadsheets/d/...">
+            </div>
+            <div class="sheets-buttons">
+                <button class="btn-config" id="inline-save-sheets-url"><i class="fas fa-save"></i> Salva</button>
+                <button class="btn-config" id="inline-import-sheets"><i class="fas fa-download"></i> Importa</button>
+                <button class="btn-config btn-remove" id="inline-remove-sheets-url"><i class="fas fa-trash"></i> Rimuovi</button>
+            </div>
+            <p style="font-size: 11px; color: #888; margin-top: 10px;">
+                *Formato CSV richiesto: Titolo, Autore, Anno, Genere
+            </p>
+        </div>
+    </div>
+
+    <div id="details-modal" class="modal">
+        <div class="modal-content" id="details-modal-content">
+            <span class="close" id="close-details">&times;</span>
+            <div class="modal-body">
+                <img src="" alt="Copertina Libro" class="modal-cover" id="modal-cover-art">
+                <div class="modal-info">
+                    <h2 id="modal-book-title"></h2>
+                    <h3 id="modal-book-author"></h3>
+                    <h4>Soggetti / Argomenti:</h4>
+                    <ul id="modal-tag-list" class="tag-list"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // --- VARIABILI GLOBALI ---
+        let books = [];
+        let filteredBooks = [];
+        let sortState = { field: 'title', direction: 1 };
+        let currentPage = 1;
+        const itemsPerPage = 10;
+        let statusTimeout;
+
+        // --- ELEMENTI DOM ---
+        const dom = {
+            bookList: document.getElementById('book-list'),
+            searchInput: document.getElementById('search-input'),
+            searchButton: document.getElementById('search-button'),
+            totalBooks: document.getElementById('total-books'),
+            uniqueAuthors: document.getElementById('unique-authors'),
+            statusMessage: document.getElementById('status-message'),
+            loader: document.getElementById('loader'),
+            pagination: document.getElementById('pagination'),
+            filterGenre: document.getElementById('filter-genre'),
+            filterYear: document.getElementById('filter-year'),
+            themeToggleButton: document.getElementById('theme-toggle-button'),
+            resetFiltersButton: document.getElementById('reset-filters-button'),
+            configModal: document.getElementById('config-modal'),
+            configToggleButton: document.getElementById('config-toggle-button'),
+            closeConfig: document.getElementById('close-config'),
+            sheetsUrlInput: document.getElementById('inline-sheets-url'),
+            saveUrlBtn: document.getElementById('inline-save-sheets-url'),
+            importBtn: document.getElementById('inline-import-sheets'),
+            removeUrlBtn: document.getElementById('inline-remove-sheets-url'),
+            detailsModal: document.getElementById('details-modal'),
+            closeDetails: document.getElementById('close-details'),
+            modalCoverArt: document.getElementById('modal-cover-art'),
+            modalBookTitle: document.getElementById('modal-book-title'),
+            modalBookAuthor: document.getElementById('modal-book-author'),
+            modalTagList: document.getElementById('modal-tag-list')
+        };
+
+        // --- FUNZIONI UTILITY ---
+        const showStatus = (message, type = 'success', duration = 5000) => {
+            clearTimeout(statusTimeout);
+            const icons = {
+                success: 'fa-check-circle',
+                error: 'fa-exclamation-triangle',
+                loading: 'fa-sync fa-spin'
+            };
+            dom.statusMessage.innerHTML = `<i class="fas ${icons[type]}"></i> ${message}`;
+            dom.statusMessage.className = `status-message status-${type}`;
+            dom.statusMessage.classList.add('show');
+            if (duration !== null) {
+                statusTimeout = setTimeout(() => dom.statusMessage.classList.remove('show'), duration);
+            }
+        };
+
+        const hideStatus = () => dom.statusMessage.classList.remove('show');
+
+        const debounce = (func, delay) => {
+            let timeout;
+            return (...args) => {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(this, args), delay);
+            };
+        };
+        
+        // =================================================================
+        // FUNZIONE OPEN LIBRARY API (Per Libri)
+        // =================================================================
+        const getBookDetails = async (author, title) => {
+            // Usa Open Library API (Gratuita, nessuna Key necessaria)
+            const searchQuery = `title:${encodeURIComponent(title)} author:${encodeURIComponent(author)}`;
+            const url = `https://openlibrary.org/search.json?q=${searchQuery}&limit=1`;
+            
+            try {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error("Errore Network Open Library");
+                const data = await response.json();
+
+                if (data.numFound === 0 || !data.docs || data.docs.length === 0) {
+                    return null;
+                }
+
+                const book = data.docs[0];
+                const coverId = book.cover_i;
+                const coverUrl = coverId 
+                    ? `https://covers.openlibrary.org/b/id/${coverId}-L.jpg` 
+                    : null;
+
+                // Open Library restituisce 'subject' che sono i tag/generi/argomenti
+                const tags = book.subject ? book.subject.slice(0, 10) : []; // Prendiamo i primi 10
+
+                return {
+                    cover: coverUrl,
+                    tags: tags,
+                    key: book.key // Identificativo Open Library
+                };
+
+            } catch (error) {
+                console.error("Errore Open Library:", error);
+                return null;
+            }
+        };
+        
+        const renderBooks = () => {
+            filteredBooks.sort((a, b) => {
+                const valA = a[sortState.field];
+                const valB = b[sortState.field];
+                let comparison = typeof valA === 'number' && typeof valB === 'number' 
+                    ? valA - valB 
+                    : String(valA).localeCompare(String(valB), 'it', { sensitivity: 'base' });
+                return comparison * sortState.direction;
+            });
+
+            const totalPages = Math.ceil(filteredBooks.length / itemsPerPage);
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const paginatedBooks = filteredBooks.slice(startIndex, startIndex + itemsPerPage);
+
+            dom.bookList.innerHTML = '';
+            if (paginatedBooks.length === 0) {
+                dom.bookList.innerHTML = `<tr><td colspan="4" class="empty-state-cell"><i class="fas fa-book"></i>Nessun libro trovato.</td></tr>`;
+            } else {
+                paginatedBooks.forEach(book => {
+                    const row = document.createElement('tr');
+                    row.className = 'fade-in';
+                    row.setAttribute('data-author', book.author);
+                    row.setAttribute('data-title', book.title);
+                    row.innerHTML = `<td>${book.title}</td><td>${book.author}</td><td>${book.year || ''}</td><td>${book.genre}</td>`;
+                    dom.bookList.appendChild(row);
+                });
+            }
+
+            updateSortIndicators();
+            updatePagination(totalPages);
+            updateStats();
+        };
+
+        const applyFiltersAndSearch = () => {
+            const searchTerm = dom.searchInput.value.toLowerCase();
+            const genreFilter = dom.filterGenre.value;
+            const yearFilter = dom.filterYear.value;
+            filteredBooks = books.filter(book => {
+                const matchesSearch = searchTerm ? 
+                    ['title', 'author', 'genre'].some(field => String(book[field]).toLowerCase().includes(searchTerm)) || 
+                    String(book.year).includes(searchTerm) : true;
+                const matchesGenre = genreFilter ? book.genre === genreFilter : true;
+                let matchesYear = true;
+                if (yearFilter) {
+                    const year = book.year;
+                    const ranges = {
+                        '2020s': [2020, new Date().getFullYear()], '2010s': [2010, 2019], '2000s': [2000, 2009],
+                        '1990s': [1990, 1999], '1980s': [1980, 1989], '1970s': [1970, 1979], '1960s': [1960, 1969],
+                        '1950s': [1950, 1959], 'pre1950': [0, 1949]
+                    };
+                    if (ranges[yearFilter]) {
+                        matchesYear = year >= ranges[yearFilter][0] && year <= ranges[yearFilter][1];
+                    }
+                }
+                return matchesSearch && matchesGenre && matchesYear;
+            });
+            currentPage = 1;
+            renderBooks();
+        };
+
+        const resetFilters = () => {
+            dom.searchInput.value = '';
+            dom.filterGenre.selectedIndex = 0;
+            dom.filterYear.selectedIndex = 0;
+            applyFiltersAndSearch();
+            showStatus("Filtri resettati.");
+        };
+        
+        const updateStats = () => {
+            dom.totalBooks.textContent = books.length;
+            dom.uniqueAuthors.textContent = new Set(books.map(b => b.author)).size;
+        };
+        
+        const updateSortIndicators = () => {
+            document.querySelectorAll('th[data-sort]').forEach(th => {
+                const field = th.dataset.sort;
+                const indicator = th.querySelector('.sort-indicator');
+                indicator.textContent = '';
+                indicator.classList.remove('active');
+                if (field === sortState.field) {
+                    indicator.textContent = sortState.direction === 1 ? '▲' : '▼';
+                    indicator.classList.add('active');
+                }
+            });
+        };
+        
+        const updatePagination = (totalPages) => {
+            dom.pagination.innerHTML = '';
+            if (totalPages <= 1) return;
+            for (let i = 1; i <= totalPages; i++) {
+                const btn = document.createElement('button');
+                btn.textContent = i;
+                if (i === currentPage) btn.classList.add('active');
+                btn.addEventListener('click', () => { currentPage = i; renderBooks(); });
+                dom.pagination.appendChild(btn);
+            }
+        };
+
+        const parseCsv = (text) => {
+            const lines = text.trim().split('\n').slice(1);
+            return lines.map(line => {
+                // CSV Atteso: Title, Author, Year, Genre
+                const [title, author, year, genre] = line.split(',').map(v => v.trim().replace(/^"|"$/g, ''));
+                return { title, author, year: parseInt(year) || 0, genre };
+            }).filter(b => b.title && b.author);
+        };
+
+        const importFromUrl = async (isAuto = false) => {
+            const url = dom.sheetsUrlInput.value.trim();
+            if (!url) { if (!isAuto) showStatus('Inserisci un URL valido.', 'error'); return; }
+            const loadingMessage = isAuto ? 'Aggiornamento automatico...' : 'Importazione...';
+            showStatus(loadingMessage, 'loading', null);
+            dom.loader.style.display = 'block';
+            try {
+                const response = await fetch(url + `&t=${Date.now()}`);
+                if (!response.ok) throw new Error(`Errore HTTP: ${response.status}`);
+                const csvText = await response.text();
+                books = parseCsv(csvText);
+                localStorage.setItem('books', JSON.stringify(books));
+                applyFiltersAndSearch();
+                showStatus(`Importati ${books.length} Libri con successo!`, 'success');
+            } catch (error) {
+                showStatus(`Errore importazione: ${error.message}`, 'error');
+                loadFromStorage();
+            } finally {
+                dom.loader.style.display = 'none';
+            }
+        };
+
+        const loadFromStorage = () => {
+            try {
+                const storedBooks = localStorage.getItem('books');
+                books = storedBooks ? JSON.parse(storedBooks) : [];
+                applyFiltersAndSearch();
+            } catch {
+                showStatus('Dati locali corrotti.', 'error');
+                books = [];
+                applyFiltersAndSearch();
+            }
+        };
+
+        const applyTheme = (theme) => {
+            document.documentElement.classList.toggle('dark-mode', theme === 'dark');
+            localStorage.setItem('theme', theme);
+        };
+        
+        // --- SETUP EVENTI ---
+        dom.themeToggleButton.addEventListener('click', () => {
+            const newTheme = document.documentElement.classList.contains('dark-mode') ? 'light' : 'dark';
+            applyTheme(newTheme);
+        });
+
+        dom.searchButton.addEventListener('click', applyFiltersAndSearch);
+        dom.searchInput.addEventListener('input', debounce(applyFiltersAndSearch, 300));
+        dom.filterGenre.addEventListener('change', applyFiltersAndSearch);
+        dom.filterYear.addEventListener('change', applyFiltersAndSearch);
+        dom.resetFiltersButton.addEventListener('click', resetFilters);
+        
+        document.querySelector('thead').addEventListener('click', (e) => {
+            const th = e.target.closest('th[data-sort]');
+            if (!th) return;
+            const field = th.dataset.sort;
+            if(sortState.field === field) {
+               sortState.direction *= -1;
+            } else {
+               sortState.field = field;
+               sortState.direction = 1;
+            }
+            renderBooks();
+        });
+        
+        dom.configToggleButton.addEventListener('click', () => dom.configModal.style.display = 'flex');
+        dom.closeConfig.addEventListener('click', () => dom.configModal.style.display = 'none');
+        dom.saveUrlBtn.addEventListener('click', () => {
+            localStorage.setItem('sheetsUrl', dom.sheetsUrlInput.value);
+            showStatus('URL salvato!', 'success');
+            dom.configModal.style.display = 'none';
+        });
+        dom.removeUrlBtn.addEventListener('click', () => {
+            localStorage.removeItem('sheetsUrl');
+            dom.sheetsUrlInput.value = '';
+            showStatus('URL rimosso.');
+        });
+        dom.importBtn.addEventListener('click', () => importFromUrl(false));
+        
+        dom.bookList.addEventListener('click', async (e) => {
+            const row = e.target.closest('tr');
+            if (!row || !row.dataset.author) return;
+            const author = row.dataset.author;
+            const title = row.dataset.title;
+            
+            showStatus('Ricerca su Open Library...', 'loading', null);
+            const details = await getBookDetails(author, title);
+            hideStatus();
+
+            dom.modalBookTitle.textContent = title;
+            dom.modalBookAuthor.textContent = author;
+            dom.modalCoverArt.src = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs='; // Reset image
+
+            dom.modalTagList.innerHTML = '';
+            if (details) {
+                if (details.cover) {
+                    dom.modalCoverArt.src = details.cover;
+                }
+                
+                if (details.tags && details.tags.length > 0) {
+                    details.tags.forEach(tag => {
+                        const li = document.createElement('li');
+                        li.textContent = tag;
+                        dom.modalTagList.appendChild(li);
+                    });
+                } else {
+                    dom.modalTagList.innerHTML = '<li>Nessun tag/soggetto disponibile.</li>';
+                }
+            } else {
+                dom.modalTagList.innerHTML = '<li>Dettagli non trovati su Open Library.</li>';
+            }
+            dom.detailsModal.style.display = 'flex';
+        });
+
+        dom.closeDetails.addEventListener('click', () => dom.detailsModal.style.display = 'none');
+        
+        window.addEventListener('click', (e) => {
+            if (e.target === dom.configModal) dom.configModal.style.display = 'none';
+            if (e.target === dom.detailsModal) dom.detailsModal.style.display = 'none';
+        });
+
+        // --- INIZIALIZZAZIONE ---
+        const init = () => {
+            applyTheme(localStorage.getItem('theme') || 'light');
+            const savedUrl = localStorage.getItem('sheetsUrl');
+            if (savedUrl) {
+                dom.sheetsUrlInput.value = savedUrl;
+                importFromUrl(true);
+            } else {
+                loadFromStorage();
+            }
+        };
+        init();
+    });
+    </script>
 </body>
 </html>
