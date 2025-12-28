@@ -826,6 +826,7 @@
         };
 
         const importFromUrl = async (isAuto = false) => {
+            // NOTA: Qui usiamo 'sheetsUrl_books' per non confonderci con l'app dei CD
             const url = dom.sheetsUrlInput.value.trim();
             if (!url) { if (!isAuto) showStatus('Inserisci un URL valido.', 'error'); return; }
             const loadingMessage = isAuto ? 'Aggiornamento automatico...' : 'Importazione...';
@@ -891,16 +892,20 @@
         
         dom.configToggleButton.addEventListener('click', () => dom.configModal.style.display = 'flex');
         dom.closeConfig.addEventListener('click', () => dom.configModal.style.display = 'none');
+        
+        // MODIFICHE IMPORTANTI PER EVITARE CONFLITTO CON CATALOGO CD
         dom.saveUrlBtn.addEventListener('click', () => {
-            localStorage.setItem('sheetsUrl', dom.sheetsUrlInput.value);
+            localStorage.setItem('sheetsUrl_books', dom.sheetsUrlInput.value); // Chiave univoca per libri
             showStatus('URL salvato!', 'success');
             dom.configModal.style.display = 'none';
         });
         dom.removeUrlBtn.addEventListener('click', () => {
-            localStorage.removeItem('sheetsUrl');
+            localStorage.removeItem('sheetsUrl_books'); // Chiave univoca per libri
             dom.sheetsUrlInput.value = '';
             showStatus('URL rimosso.');
         });
+        // FINE MODIFICHE
+        
         dom.importBtn.addEventListener('click', () => importFromUrl(false));
         
         dom.bookList.addEventListener('click', async (e) => {
@@ -948,7 +953,8 @@
         // --- INIZIALIZZAZIONE ---
         const init = () => {
             applyTheme(localStorage.getItem('theme') || 'light');
-            const savedUrl = localStorage.getItem('sheetsUrl');
+            // MODIFICATO PER USARE LA CHIAVE 'sheetsUrl_books'
+            const savedUrl = localStorage.getItem('sheetsUrl_books');
             if (savedUrl) {
                 dom.sheetsUrlInput.value = savedUrl;
                 importFromUrl(true);
