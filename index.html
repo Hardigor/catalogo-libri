@@ -839,7 +839,8 @@
                 books = parseCsv(csvText);
                 localStorage.setItem('books', JSON.stringify(books));
                 applyFiltersAndSearch();
-                showStatus(`Importati ${books.length} Libri con successo!`, 'success');
+                // MESSAGGIO MODIFICATO SU RICHIESTA UTENTE
+                showStatus('Importazione libri avvenuta correttamente', 'success');
             } catch (error) {
                 showStatus(`Errore importazione: ${error.message}`, 'error');
                 loadFromStorage();
