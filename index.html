@@ -121,7 +121,7 @@
         .logo {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 15px; /* Aumentato leggermente lo spazio */
             flex: 1;
             justify-content: center;
         }
@@ -130,35 +130,21 @@
             .logo { justify-content: flex-start; }
         }
         
-        .logo-icon {
-            font-size: 20px;
-            color: var(--accent-color);
-            background: none;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        /* --- STILE LOGO CLASSICO (OTTIMIZZATO) --- */
+        .custom-logo {
+            /* Dimensione fissa per evitare che sia enorme */
+            height: 50px; 
+            width: auto; 
+            object-fit: contain;
+            
+            /* Transizione fluida per l'inversione colori */
+            transition: filter 0.3s ease;
         }
-        
-        /* --- STILE PER IL LOGO COLORATO DINAMICAMENTE (MASKING) --- */
-        .custom-logo-container {
-            width: 36px;
-            height: 36px;
-            /* Questo è il segreto: lo sfondo è il colore dell'accento */
-            background-color: var(--accent-color);
-            
-            /* Qui diciamo di usare l'immagine come maschera di ritaglio */
-            -webkit-mask-size: contain;
-            mask-size: contain;
-            -webkit-mask-repeat: no-repeat;
-            mask-repeat: no-repeat;
-            -webkit-mask-position: center;
-            mask-position: center;
-            
-            /* Assicura che la transizione del colore avvenga anche qui */
-            transition: background-color 0.2s ease;
+
+        /* --- TRUCCO PER LA DARK MODE --- */
+        /* Quando il sito è scuro, inverte i colori del logo (Nero -> Bianco) */
+        html.dark-mode .custom-logo {
+            filter: invert(1) brightness(2); 
         }
         
         .container {
@@ -496,8 +482,7 @@
         <div class="header-container">
             <header>
                 <div class="logo">
-                    <div class="custom-logo-container" style="-webkit-mask-image: url('logo.png'); mask-image: url('logo.png');"></div>
-                    
+                    <img src="logo.png" alt="Logo Catalogo" class="custom-logo">
                     <h1>Catalogo Libri</h1>
                 </div>
                 <div class="theme-toggle">
