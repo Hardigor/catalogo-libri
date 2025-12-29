@@ -953,14 +953,13 @@
         // --- INIZIALIZZAZIONE ---
         const init = () => {
             applyTheme(localStorage.getItem('theme') || 'light');
-            // MODIFICATO PER USARE LA CHIAVE 'sheetsUrl_books'
-            const savedUrl = localStorage.getItem('sheetsUrl_books');
-            if (savedUrl) {
-                dom.sheetsUrlInput.value = savedUrl;
-                importFromUrl(true);
-            } else {
-                loadFromStorage();
-            }
+            
+            // --- URL INSERITO AUTOMATICAMENTE NEL CODICE ---
+            const mySheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT6tnZrwz9lOJm_O8Cf6d-mGYuBmEaiPkBrT6d1w0VM4hTcM6k6ldBzkYjSjxkVBb6iWnk27fLTRfIO/pub?output=csv";
+
+            // Imposta l'URL e avvia l'importazione automaticamente
+            dom.sheetsUrlInput.value = mySheetUrl;
+            importFromUrl(true); 
         };
         init();
     });
