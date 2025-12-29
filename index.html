@@ -130,12 +130,35 @@
             .logo { justify-content: flex-start; }
         }
         
-        /* --- NUOVO STILE PER IL LOGO IMMAGINE --- */
-        .custom-logo {
-            height: 36px; /* Altezza fissa per allinearsi col bottone tema */
-            width: auto; /* Larghezza automatica per mantenere le proporzioni */
-            max-width: 120px; /* Evita che loghi molto larghi rompano il layout */
-            object-fit: contain;
+        .logo-icon {
+            font-size: 20px;
+            color: var(--accent-color);
+            background: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* --- STILE PER IL LOGO COLORATO DINAMICAMENTE (MASKING) --- */
+        .custom-logo-container {
+            width: 36px;
+            height: 36px;
+            /* Questo è il segreto: lo sfondo è il colore dell'accento */
+            background-color: var(--accent-color);
+            
+            /* Qui diciamo di usare l'immagine come maschera di ritaglio */
+            -webkit-mask-size: contain;
+            mask-size: contain;
+            -webkit-mask-repeat: no-repeat;
+            mask-repeat: no-repeat;
+            -webkit-mask-position: center;
+            mask-position: center;
+            
+            /* Assicura che la transizione del colore avvenga anche qui */
+            transition: background-color 0.2s ease;
         }
         
         .container {
@@ -434,7 +457,7 @@
         .btn-config:hover { background: var(--row-hover-bg); }
         .sheets-buttons { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
         .pagination { display: flex; justify-content: center; margin-top: 15px; gap: 4px; flex-wrap: wrap; }
-        .pagination button { padding: 8px 12px; border: 1px solid var(--border-color); background-color: var(--card-bg); color: var(--text-color); border-radius: var(--radius-sm); cursor: pointer; transition: var(--transition); font-size: 13px; min-width 36px; }
+        .pagination button { padding: 8px 12px; border: 1px solid var(--border-color); background-color: var(--card-bg); color: var(--text-color); border-radius: var(--radius-sm); cursor: pointer; transition: var(--transition); font-size: 13px; min-width: 36px; }
         .pagination button:hover { background-color: var(--row-hover-bg); }
         .pagination button.active { background: var(--accent-color); color: var(--button-text); font-weight: 600; border: 1px solid var(--accent-color); }
         .pagination button:disabled { opacity: 0.5; cursor: not-allowed; }
@@ -473,7 +496,8 @@
         <div class="header-container">
             <header>
                 <div class="logo">
-                    <img src="logo.png" alt="Logo Catalogo" class="custom-logo">
+                    <div class="custom-logo-container" style="-webkit-mask-image: url('logo.png'); mask-image: url('logo.png');"></div>
+                    
                     <h1>Catalogo Libri</h1>
                 </div>
                 <div class="theme-toggle">
